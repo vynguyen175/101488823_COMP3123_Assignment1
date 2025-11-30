@@ -3,33 +3,37 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { connectDB } from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
-import User from "./models/User.js";
 import empRoutes from "./routes/employeeRoutes.js";
+import path from "path";
 
 dotenv.config();
+
 const app = express();
+
+// CORS
 app.use(cors());
+
+// JSON body parser
 app.use(express.json());
+
+// ⭐ REQUIRED: Parse form-data text fields
+app.use(express.urlencoded({ extended: true }));
+
+// Connect DB
+connectDB();
+
+// Serve uploaded images
+app.use("/uploads", express.static("uploads"));
+
+// Routes
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/emp", empRoutes);
 
-// Connect to MongoDB
-connectDB();
-
-// Temporary test route (optional)
-app.get("/test", async (req, res) => {
-  const user = new User({ username: "test", email: "test@email.com", password: "123456" });
-  await user.save();
-  res.json({ message: "Test user saved!" });
-});
-
-// Root route
+// Root test endpoint
 app.get("/", (req, res) => {
   res.json({ message: "Server is running..." });
 });
 
-// Mount routes
-app.use("/api/v1/user", userRoutes);
-
-const PORT = process.env.PORT || 8081;
+// Server start
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

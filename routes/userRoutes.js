@@ -1,44 +1,26 @@
-/**
- * User Routes
- * 
- * Defines API endpoints for user authentication operations.
- * Base path: /api/v1/user
- * 
- * Available endpoints:
- * - POST /signup - Register a new user account
- * - POST /login - Authenticate existing user and get JWT token
- */
-
 import express from "express";
+import { body } from "express-validator";
 import { signup, login } from "../controllers/userController.js";
 
-// Create Express router instance
 const router = express.Router();
 
-// ============================
-// USER AUTHENTICATION ROUTES
-// ============================
+router.post(
+  "/signup",
+  [
+    body("username").notEmpty().withMessage("Username is required"),
+    body("email").isEmail().withMessage("Valid email is required"),
+    body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters"),
+  ],
+  signup
+);
 
-/**
- * POST /api/v1/user/signup
- * Register a new user account
- * 
- * Request body:
- * - username: string
- * - email: string
- * - password: string
- */
-router.post("/signup", signup);
+router.post(
+  "/login",
+  [
+    body("email").isEmail().withMessage("Valid email is required"),
+    body("password").notEmpty().withMessage("Password is required"),
+  ],
+  login
+);
 
-/**
- * POST /api/v1/user/login
- * Authenticate user and receive JWT token
- * 
- * Request body:
- * - email: string
- * - password: string
- */
-router.post("/login", login);
-
-// Export router to be mounted in main server file
 export default router;
